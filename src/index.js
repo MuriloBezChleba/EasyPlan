@@ -1,14 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Use apenas uma importação do react-dom/client
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom'; // Mantenha o Router aqui
 
-// Criação do root para a renderização
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
-// Renderização do componente App dentro do Router
 root.render(
   <React.StrictMode>
     <Router>
