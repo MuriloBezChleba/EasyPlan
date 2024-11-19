@@ -1,0 +1,22 @@
+.day-container {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: white; /* Texto branco */
+  background-color: black; /* Fundo preto */
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.back-button {
+  padding: 10px;
+  background-color: #444; /* Botão cinza escuro */
+  color: white; /* Texto branco */
+  border: 1px solid #888; /* Borda cinza clara */
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: #666; /* Cinza médio ao passar o mouse */
+  border-color: white; /* Destaque para a borda ao passar o mouse */
+}

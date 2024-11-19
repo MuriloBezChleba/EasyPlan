@@ -4,6 +4,8 @@
   box-sizing: border-box; /* Inclui padding e border no cálculo da largura/altura */
 }
 
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
 
 
 

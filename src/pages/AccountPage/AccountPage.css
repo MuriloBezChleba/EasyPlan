@@ -1,0 +1,119 @@
+.account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #000; /* Fundo preto */
+    color: white;
+    padding: 20px;
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  button {
+    padding: 10px 15px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #ccc;
+  }
+  
+  .save-button-container {
+    margin-top: 30px;
+  }
+  
+  .save-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049;
+  }
+  
+  .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .popup-content {
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .popup-content h2 {
+    margin-bottom: 15px;
+  }
+  
+  .popup-content input {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .popup-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .popup-buttons button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .popup-buttons button:first-child {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .popup-buttons button:last-child {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .save-button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: none; /* Remove sublinhado do link */
+    display: inline-block;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049;
+  }
+  
+  
