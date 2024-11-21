@@ -1,3 +1,4 @@
+// src/App.js
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import FirstPage from './pages/FirstPage/FirstPage';
@@ -6,10 +7,11 @@ import TimerPage from './pages/TimerPage/TimerPage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
 import DayPage from './pages/DayPage/DayPage';
 import AccountPage from './pages/AccountPage/AccountPage';
+import { AppointmentsProvider } from './context/AppointmentsContext'; // Importa o provedor
 
 function App() {
   return (
-    <>
+    <AppointmentsProvider> {/* Envolvendo a aplicação com o provedor */}
       <main>
         <Routes>
           <Route path="/" element={<FirstPage />} />
@@ -21,7 +23,7 @@ function App() {
         </Routes>
       </main>
       <Navbar />
-    </>
+    </AppointmentsProvider>
   );
 }
 

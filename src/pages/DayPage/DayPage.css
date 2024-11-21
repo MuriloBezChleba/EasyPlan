@@ -1,22 +1,132 @@
-.day-container {
-  text-align: center;
-  font-family: Arial, sans-serif;
-  color: white; /* Texto branco */
-  background-color: black; /* Fundo preto */
+/* src/pages/DayPage/DayPage.css */
+
+/* Contêiner da página */
+.day-page-container {
+  background-color: #f4f4f9; /* Fundo suave para a página */
   min-height: 100vh;
   padding: 20px;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.back-button {
-  padding: 10px;
-  background-color: #444; /* Botão cinza escuro */
-  color: white; /* Texto branco */
-  border: 1px solid #888; /* Borda cinza clara */
-  border-radius: 4px;
+/* Formulário de adicionar compromisso */
+.add-appointment-form {
+  background-color: rgba(255, 255, 255, 0.95); /* Fundo branco com leve opacidade */
+  border-radius: 15px;
+  padding: 30px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.add-appointment-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+/* Estilo dos campos de input e textarea */
+.input-field, .textarea-field {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px; /* Mais espaçamento entre os campos */
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+/* Focus nos inputs */
+.input-field:focus, .textarea-field:focus {
+  border-color: #4CAF50; /* Borda verde quando o campo é focado */
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.6); /* Sombra suave ao focar */
+}
+
+/* Estilo da área de texto */
+.textarea-field {
+  height: 150px;
+  resize: vertical;
+  background-color: #f0f0f0;
+}
+
+/* Botões com estilo moderno */
+.button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50; /* Cor de fundo verde */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
   cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
 }
 
-.back-button:hover {
-  background-color: #666; /* Cinza médio ao passar o mouse */
-  border-color: white; /* Destaque para a borda ao passar o mouse */
+.button:hover {
+  background-color: #45a049; /* Cor um pouco mais escura ao passar o mouse */
+}
+
+/* Estilo da lista de compromissos */
+.appointment-list {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.appointment {
+  background-color: #f1f1f1;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.appointment h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.appointment p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Ajustes para a navbar e ícones */
+.navbar {
+  background-color: #333;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.2rem;
+  margin: 0 20px;
+}
+
+.navbar a:hover {
+  color: #4CAF50; /* Verde ao passar o mouse */
+}
+
+.icon {
+  color: #333; /* Cor padrão dos ícones */
+  font-size: 1.6rem;
+  transition: color 0.3s;
+}
+
+.icon:hover {
+  color: #4CAF50; /* Verde quando o mouse passa sobre o ícone */
 }
