@@ -1,0 +1,30 @@
+.login-container {
+    display: flex;
+    flex-direction: column; /* Para empilhar os elementos verticalmente */
+    align-items: center;    /* Para centralizar horizontalmente */
+    justify-content: center; /* Para centralizar verticalmente */
+    width: 100%;            /* Para ocupar toda a largura do contêiner pai */
+    max-width: 400px;      /* Limita a largura máxima do formulário */
+    margin: 0 auto;        /* Centraliza o contêiner */
+    padding: 40px;         /* Aumente o padding conforme necessário */
+    
+    border-radius: 5px;    /* Bordas arredondadas */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+
+.button-container {
+    display: flex;                       /* Usando Flexbox para alinhar os botões */
+    justify-content: space-around;      /* Espaço igual entre os botões */
+    width: 100%;                        /* Faz o contêiner ocupar toda a largura disponível */
+    margin-top: 20px;                   /* Espaço acima dos botões */
+}
+
+
+.email-input, .password-input {
+    width: 100%;                 /* Faz os inputs ocupar 100% da largura disponível */
+    margin-bottom: 20px;         /* Aumente o espaço abaixo de cada input */
+    padding: 15px;               /* Aumenta o espaçamento interno dos inputs */
+    border: 1px solid #ccc;      /* Borda */
+    border-radius: 4px;          /* Bordas arredondadas */
+}

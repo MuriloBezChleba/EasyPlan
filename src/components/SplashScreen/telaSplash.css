@@ -1,0 +1,22 @@
+.splash-screen {
+    position: fixed; /* Para cobrir toda a tela */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white; /* Cor de fundo da tela de splash */
+    transition: opacity 0.5s ease; /* Efeito de transição */
+    opacity: 1; /* Iniciar totalmente visível */
+}
+
+.fade-in {
+    opacity: 1; /* Totalmente visível */
+}
+
+.fade-out {
+    opacity: 0; /* Invisível */
+    z-index: -1;
+}

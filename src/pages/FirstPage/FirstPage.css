@@ -1,0 +1,10 @@
+main{
+    display: flex;               /* Ativa o flexbox */
+    justify-content: center; 
+    justify-items: center; 
+}
+
+
+.logo{
+    justify-content: center;
+}

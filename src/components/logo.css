@@ -1,0 +1,6 @@
+.img {
+    width: 300px; /* Largura da imagem */
+    height: auto; /* Manter a proporção */
+    border-radius: 10px; /* Bordas arredondadas */
+  }
+  
