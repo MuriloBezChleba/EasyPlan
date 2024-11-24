@@ -1,6 +1,7 @@
 // src/pages/CadastroPage/CadastroPage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; // Importe o Link do React Router
+import axios from 'axios'; // Importe axios para fazer requisições HTTP
 
 function CadastroPage() {
   const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ function CadastroPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validações simples
@@ -35,8 +36,19 @@ function CadastroPage() {
     }
 
     setErro('');
-    alert('Conta criada com sucesso!');
-    console.log('Dados enviados:', formData);
+
+    try {
+      // Enviando os dados para a API
+      const response = await axios.post('http://localhost:5000/cadastro', formData);
+      alert('Conta criada com sucesso!');
+      console.log('Resposta do servidor:', response.data);
+    } catch (error) {
+      if (error.response) {
+        setErro(error.response.data);
+      } else {
+        setErro('Erro ao criar conta.');
+      }
+    }
   };
 
   return (
@@ -81,7 +93,7 @@ function CadastroPage() {
           />
         </div>
         <div style={styles.inputGroup}>
-          <label htmlFor="confirmSenha">Confirme a senha:</label>
+          <label htmlFor="confirmSenha">Confirmar Senha:</label>
           <input
             type="password"
             id="confirmSenha"
@@ -92,17 +104,10 @@ function CadastroPage() {
             style={styles.input}
           />
         </div>
-        <button type="submit" style={styles.button}>
-          Criar Conta
-        </button>
+        <button type="submit" style={styles.submitButton}>Cadastrar</button>
       </form>
-
-      {/* Link para a tela de login */}
-      <p style={styles.loginText}>
-        Já tem conta?{' '}
-        <Link to="/" style={styles.loginLink}>
-          Entrar
-        </Link>
+      <p>
+        Já tem uma conta? <Link to="/login" style={styles.link}>Faça login</Link>
       </p>
     </div>
   );
@@ -110,53 +115,43 @@ function CadastroPage() {
 
 const styles = {
   container: {
-    maxWidth: '400px',
-    margin: '0 auto',
-    textAlign: 'center',
-    padding: '20px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: '50px',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px',
+    width: '300px',
   },
   inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'left',
+    marginBottom: '15px',
   },
   input: {
-    padding: '8px',
+    width: '100%',
+    padding: '10px',
+    marginTop: '5px',
     fontSize: '16px',
-    borderRadius: '4px',
+    borderRadius: '5px',
     border: '1px solid #ccc',
   },
-  button: {
+  submitButton: {
     padding: '10px',
     fontSize: '16px',
-    color: '#fff',
-    backgroundColor: '#007BFF',
+    borderRadius: '5px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
     border: 'none',
-    borderRadius: '4px',
     cursor: 'pointer',
-  },
-  buttonHover: {
-    backgroundColor: '#0056b3',
   },
   error: {
     color: 'red',
     fontSize: '14px',
     marginBottom: '10px',
   },
-  loginText: {
-    marginTop: '20px',
-    fontSize: '14px',
-  },
-  loginLink: {
-    color: '#007BFF',
+  link: {
+    color: '#4CAF50',
     textDecoration: 'none',
   },
 };

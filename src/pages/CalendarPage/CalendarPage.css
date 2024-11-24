@@ -94,3 +94,25 @@
   background-color: #fff;
   color: #333;
 }
+
+
+.calendar-day {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.has-appointments {
+  background-color: #ff6347;  /* Altere para a cor desejada */
+  color: white;
+  font-weight: bold;
+}
+
+.calendar-day:hover {
+  background-color: #f0f0f0;
+}
+
+.calendar-day.not-current-month {
+  background-color: #f0f0f0; /* Cinza claro para os dias que não pertencem ao mês */
+  color: #ccc; /* Cor mais suave para os números */
+}
