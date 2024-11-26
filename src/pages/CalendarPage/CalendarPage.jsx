@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppointments } from '../../context/AppointmentsContext';
+import Navbar from '../../components/Navbar';
 import './CalendarPage.css';
 
 const CalendarPage = () => {
@@ -100,6 +101,7 @@ const CalendarPage = () => {
 
   return (
     <div className="calendar-container">
+      <Navbar/>
       <h1>{months[currentMonth]} {currentYear}</h1>
       <div className="month-slide">
         <button onClick={goToPreviousMonth}>◀</button>
@@ -127,6 +129,7 @@ const CalendarPage = () => {
           );
         })}
       </div>
+      
     </div>
   );
 };

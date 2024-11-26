@@ -1,7 +1,6 @@
-// src/pages/CadastroPage/CadastroPage.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Importe o Link do React Router
-import axios from 'axios'; // Importe axios para fazer requisições HTTP
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate para redirecionamento
+import axios from 'axios';
 
 function CadastroPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +11,7 @@ function CadastroPage() {
   });
 
   const [erro, setErro] = useState('');
+  const navigate = useNavigate(); // Hook de navegação
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +42,9 @@ function CadastroPage() {
       const response = await axios.post('http://localhost:5000/cadastro', formData);
       alert('Conta criada com sucesso!');
       console.log('Resposta do servidor:', response.data);
+
+      // Redirecionando para a página de login após cadastro bem-sucedido
+      navigate('/login');
     } catch (error) {
       if (error.response) {
         setErro(error.response.data);

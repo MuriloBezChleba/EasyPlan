@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import './TimerPage.css'; // Importar o CSS
+import './TimerPage.css';
+import Navbar from '../../components/Navbar';
+import EarthImage from '../../images/terra.svg'; // Imagem da Terra
+import MoonImage from '../../images/lua.svg'; // Imagem da Lua
+import { useNavigate } from 'react-router-dom';
 
 const TimerPage = () => {
   const [time, setTime] = useState(0); // Tempo em segundos
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedTime, setSelectedTime] = useState(0); // Tempo selecionado pelo usuário
+  const [selectedTime, setSelectedTime] = useState(25); // Tempo default de 25 minutos
   const [timerId, setTimerId] = useState(null);
+  const [hasStarted, setHasStarted] = useState(false); // Para controlar se o timer já foi iniciado
+  const navigate = useNavigate();
 
   const startTimer = () => {
-    if (selectedTime === 0) return;
+    if (selectedTime <= 0) return;
 
     setIsRunning(true);
-    setTime(selectedTime);
+    setTime(selectedTime * 60); // Converte minutos para segundos
+    setHasStarted(true);
 
     const id = setInterval(() => {
       setTime((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(id);
           setIsRunning(false);
+          setHasStarted(false); // Resetar o estado de início após terminar
+          savePomodoro(selectedTime); // Salva o tempo quando o timer acabar
           return 0;
         }
         return prevTime - 1;
@@ -30,57 +39,100 @@ const TimerPage = () => {
   const stopTimer = () => {
     clearInterval(timerId);
     setIsRunning(false);
+    setHasStarted(false);
+    setSelectedTime(25); // Resetar o tempo selecionado para o valor default
   };
 
-  const resetTimer = () => {
-    clearInterval(timerId);
-    setTime(0);
-    setIsRunning(false);
+  const savePomodoro = (tempoAtiv) => {
+    // Chama a API para salvar o tempo no banco de dados
+    fetch('http://localhost:5000/save-pomodoro', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tempoAtiv: time }), // Envia o valor correto
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Resposta do servidor:', data);
+    })
+    .catch(error => {
+      console.error('Erro ao salvar o tempo:', error);
+    });
+    
+  };
+
+  useEffect(() => {
+    // Resetar o timer se o usuário mudar de página
+    const handleBeforeUnload = () => {
+      stopTimer();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  const handleNavigate = () => {
+    stopTimer();
+    navigate('/outra-pagina'); // Mude para o caminho desejado
   };
 
   return (
     <div className="timer-container">
-      <div className="time-selector">
-        <label>Selecione o tempo (em minutos):</label>
-        <input
-          type="number"
-          value={selectedTime}
-          onChange={(e) => setSelectedTime(e.target.value)}
-          disabled={isRunning}
-        />
-      </div>
-
+      <Navbar />
       <div className="timer">
         <div className="orbit-container">
-          {/* Círculo da trajetória */}
+          {/* Marca de onde a Lua começa */}
+          <div className="orbit-start-marker"></div>
+
+          {/* Trajetória (caminho da órbita) */}
           <div className="orbit-path"></div>
 
-          <div className="large-ball">
+          {/* Bola maior com imagem (Terra) */}
+          <div
+            className="large-ball"
+            style={{
+              backgroundImage: `url(${EarthImage})`,
+            }}
+          >
+            {/* Bola menor com imagem (Lua) */}
             <div
               className="small-ball"
               style={{
-                animationDuration: `${selectedTime * 60}s`,
-                animationPlayState: isRunning ? 'running' : 'paused',
+                backgroundImage: `url(${MoonImage})`,
+                animationDuration: `${selectedTime * 60}s`, // Define o tempo da animação
+                animationPlayState: isRunning ? 'running' : 'paused', // Controla o estado da animação
               }}
             />
           </div>
         </div>
-
-        <div className="time-display">
-          {time}s
-        </div>
       </div>
 
-      <div className="controls">
-        <button onClick={startTimer} disabled={isRunning}>
-          Iniciar
-        </button>
-        <button onClick={stopTimer} disabled={!isRunning}>
-          Parar
-        </button>
-        <button onClick={resetTimer}>
-          Resetar
-        </button>
+      <div className="time-control">
+        {!isRunning ? (
+          <div className="time-selector">
+            <label>Selecione o tempo (em minutos):</label>
+            <input
+              type="number"
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(Number(e.target.value))}
+              min="1"
+            />
+            <button onClick={startTimer} disabled={selectedTime <= 0}>
+              Iniciar
+            </button>
+          </div>
+        ) : (
+          <div className="time-display">
+            <span>
+              {Math.floor(time / 60)}:{String(time % 60).padStart(2, '0')}s
+            </span>
+            <button onClick={stopTimer}>Parar</button>
+          </div>
+        )}
       </div>
     </div>
   );

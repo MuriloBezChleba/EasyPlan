@@ -1,106 +1,120 @@
 .timer-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f0f0f0;
-    font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+}
+
+.timer {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 40px;
+}
+
+.orbit-container {
+  position: absolute;
+  top: 45%; /* Ajusta a posição para subir os planetas */
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.large-ball {
+  width: 100px; /* Diâmetro da bola maior */
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+}
+
+.orbit-start-marker {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: red;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbit-path {
+  position: absolute;
+  width: 330px; /* Diâmetro da órbita */
+  height: 330px;
+  border: 2px solid #007bff; /* Linha sólida */
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.small-ball {
+  width: 20px; /* Diâmetro da bola menor */
+  height: 20px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: -160px 0; /* Origem da rotação */
+  animation-name: orbit;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(-160px) rotate(0deg);
   }
-  
-  .time-selector {
-    margin-bottom: 20px;
-    text-align: center;
+  100% {
+    transform: rotate(360deg) translateX(-160px) rotate(-360deg);
   }
-  
-  .timer {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    margin-bottom: 20px;
-  }
-  
-  .orbit-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translate(-50%, -50%); /* Centraliza a órbita no centro da bola maior */
-  }
-  
-  .large-ball {
-    width: 100px; /* Raio da bola maior */
-    height: 100px;
-    background-color: #007bff;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2; /* Coloca a bola maior acima do círculo da órbita */
-  }
-  
-  /* Estilo do círculo da trajetória */
-  .orbit-path {
-    position: absolute;
-    width: 330px; /* Diâmetro da órbita */
-    height: 330px;
-    border: 2px dashed #aaa; /* Estilo do círculo */
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Centraliza o círculo da trajetória */
-  }
-  
-  .small-ball {
-    width: 20px; /* Raio da bola menor */
-    height: 20px;
-    background-color: red;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%; /* Centraliza verticalmente em relação à bola maior */
-    left: 50%; /* Centraliza horizontalmente em relação à bola maior */
-    transform-origin: -60px 0; /* A origem da rotação é o centro da bola maior */
-    animation-name: orbit;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-  
-  @keyframes orbit {
-    0% {
-      transform: rotate(0deg) translateX(-160px) rotate(0deg); /* Raio da órbita: 165px (distância do centro da bola maior) */
-    }
-    100% {
-      transform: rotate(360deg) translateX(-160px) rotate(-360deg); /* A bola menor faz uma volta completa ao redor da bola maior */
-    }
-  }
-  
-  .time-display {
-    font-size: 32px;
-    font-weight: bold;
-  }
-  
-  .controls {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
-  
-  button {
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
+}
+
+.time-control {
+  text-align: center;
+}
+
+.time-selector label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.time-selector input {
+  width: 80px;
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.time-selector button,
+.time-display button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.time-selector button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.time-display span {
+  font-size: 32px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+}

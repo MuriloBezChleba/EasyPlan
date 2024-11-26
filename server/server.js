@@ -29,6 +29,42 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+
+// Rota para salvar o tempo de atividade (Pomodoro) e a data
+app.post('/save-pomodoro', (req, res) => {
+  const { tempoAtiv } = req.body; // tempoAtiv em minutos
+  console.log(`Tempo recebido: ${tempoAtiv}`); // Verifique se tempoAtiv está sendo recebido corretamente
+
+  // Verificar se tempoAtiv está definido e é um número válido
+  if (!tempoAtiv || isNaN(tempoAtiv)) {
+    return res.status(400).json({ error: 'Tempo inválido!' });
+  }
+
+  // Inserir tempoAtiv na tabela tbpomodoro
+  db.query('INSERT INTO tbpomodoro (tempoAtiv) VALUES (?)', [tempoAtiv], (err, result) => {
+    if (err) {
+      console.error('Erro ao salvar tempoAtiv na tbpomodoro:', err);
+      return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
+    }
+
+    // Salvar estatísticas na tbestat
+    const dataAtiv = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    db.query('INSERT INTO tbestat (tempoAtiv, dataAtiv) VALUES (?, ?)', [tempoAtiv, dataAtiv], (err, result) => {
+      if (err) {
+        console.error('Erro ao salvar na tbestat:', err);
+        return res.status(500).json({ error: 'Erro ao salvar as estatísticas.' });
+      }
+
+      // Se não houver erro, enviar uma resposta de sucesso
+      res.status(200).json({ message: 'Tempo e estatísticas salvos com sucesso!' });
+    });
+  });
+});
+
+
+
+
+
 // Rota para cadastro de usuário
 app.post('/cadastro', (req, res) => {
   const { nome, email, senha } = req.body;

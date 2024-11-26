@@ -1,4 +1,3 @@
-// context/AppointmentsContext.js
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
@@ -13,14 +12,22 @@ export const useAppointments = () => {
 // Componente que vai fornecer o estado e funções para os compromissos
 export const AppointmentsProvider = ({ children }) => {
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);  // Estado para controle de carregamento
+  const [error, setError] = useState(null);  // Estado para controle de erro
 
   // Função para buscar compromissos do backend com base na data
   const fetchAppointments = async (dateKey) => {
+    setLoading(true);
+    setError(null);  // Reseta o erro sempre que começa uma nova requisição
+
     try {
       const response = await axios.get(`http://localhost:5000/api/calendario/${dateKey}`);
       setAppointments(response.data);  // Atualiza os compromissos com a data correta
     } catch (error) {
       console.error('Erro ao buscar compromissos:', error);
+      setError('Erro ao carregar compromissos. Tente novamente mais tarde.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,7 +58,7 @@ export const AppointmentsProvider = ({ children }) => {
   };
 
   return (
-    <AppointmentsContext.Provider value={{ appointments, fetchAppointments, addAppointment, deleteAppointment }}>
+    <AppointmentsContext.Provider value={{ appointments, fetchAppointments, addAppointment, deleteAppointment, loading, error }}>
       {children}
     </AppointmentsContext.Provider>
   );

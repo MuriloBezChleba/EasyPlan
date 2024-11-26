@@ -1,29 +1,64 @@
-import { Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import FirstPage from './pages/FirstPage/FirstPage';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import CadastroPage from './pages/CadastroPage/CadastroPage';
 import TimerPage from './pages/TimerPage/TimerPage';
 import CalendarPage from './pages/CalendarPage/CalendarPage';
 import DayPage from './pages/DayPage/DayPage';
 import AccountPage from './pages/AccountPage/AccountPage';
-import { AppointmentsProvider } from './context/AppointmentsContext'; // Corrigido
-import { useState } from 'react';
-import Login from './pages/FirstPage/FirstPage'; // Ajuste o caminho conforme necessário
+import Login from './pages/FirstPage/FirstPage';
+import { AppointmentsProvider } from './context/AppointmentsContext';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('token') !== null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Verifica se há token no localStorage
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token); // Atualiza o estado com base no token
+    setLoading(false); // Remove o estado de carregamento
+  }, []);
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <AppointmentsProvider>
-      <Navbar isAuthenticated={isAuthenticated} />
       <Routes>
+        {/* Rota inicial */}
+        <Route
+          path="/"
+          element={<Navigate to={isAuthenticated ? '/timer' : '/login'} />}
+        />
+
+        {/* Página de login */}
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/timer" />
+            ) : (
+              <Login setIsAuthenticated={setIsAuthenticated} />
+            )
+          }
+        />
+
+        {/* Página de cadastro */}
         <Route path="/cadastro" element={<CadastroPage />} />
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/timer" element={<TimerPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/day" element={<DayPage />} />
-        <Route path="/conta" element={<AccountPage />} />
-        <Route path="/" element={<FirstPage />} />
+
+        {/* Rotas protegidas */}
+        {isAuthenticated ? (
+          <>
+            <Route path="/timer" element={<TimerPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/day" element={<DayPage />} />
+            <Route path="/conta" element={<AccountPage />} />
+          </>
+        ) : (
+          // Redireciona qualquer rota não protegida para login
+          <Route path="*" element={<Navigate to="/login" />} />
+        )}
       </Routes>
     </AppointmentsProvider>
   );
