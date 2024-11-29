@@ -2,7 +2,6 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const app = express();
 const port = 5000;
 
@@ -17,53 +16,81 @@ const db = mysql.createConnection({
   database: 'easy_plan',
 });
 
-// Middleware de autenticação
-const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization');
-  if (!token) return res.status(401).send('Acesso negado');
-
-  jwt.verify(token, 'secreta', (err, user) => {
-    if (err) return res.status(403).send('Token inválido');
-    req.user = user;
-    next();
-  });
-};
-
-
-// Rota para salvar o tempo de atividade (Pomodoro) e a data
+//salvar o pomodoro
 app.post('/save-pomodoro', (req, res) => {
-  const { tempoAtiv } = req.body; // tempoAtiv em minutos
-  console.log(`Tempo recebido: ${tempoAtiv}`); // Verifique se tempoAtiv está sendo recebido corretamente
-
-  // Verificar se tempoAtiv está definido e é um número válido
+  const { tempoAtiv } = req.body;
+  console.log('Tempo de atividade recebido:', tempoAtiv); // Verifique o valor recebido
+  
   if (!tempoAtiv || isNaN(tempoAtiv)) {
     return res.status(400).json({ error: 'Tempo inválido!' });
   }
 
-  // Inserir tempoAtiv na tabela tbpomodoro
-  db.query('INSERT INTO tbpomodoro (tempoAtiv) VALUES (?)', [tempoAtiv], (err, result) => {
+  // Verificar se já existe um registro para o mesmo tempo de atividade
+  db.query('SELECT * FROM tbpomodoro ORDER BY id DESC LIMIT 1', (err, result) => {
     if (err) {
-      console.error('Erro ao salvar tempoAtiv na tbpomodoro:', err);
+      console.error('Erro ao recuperar o tempo total:', err);
       return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
     }
 
-    // Salvar estatísticas na tbestat
-    const dataAtiv = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
-    db.query('INSERT INTO tbestat (tempoAtiv, dataAtiv) VALUES (?, ?)', [tempoAtiv, dataAtiv], (err, result) => {
+    // Se o tempo de atividade já foi salvo, não insira novamente
+    if (result.length > 0 && result[0].tempoAtiv === tempoAtiv) {
+      return res.status(400).json({ error: 'Esse tempo de atividade já foi salvo.' });
+    }
+
+    // Recupera o último tempo total armazenado
+    const lastTotalTime = result[0] ? result[0].tempoTotal : 0;
+
+    // Calcula o novo tempo total
+    const totalTime = lastTotalTime + tempoAtiv;
+
+    // Insere o novo tempo de atividade com o tempo total atualizado
+    db.query('INSERT INTO tbpomodoro (tempoAtiv, tempoTotal) VALUES (?, ?)', [tempoAtiv, totalTime], (err) => {
       if (err) {
-        console.error('Erro ao salvar na tbestat:', err);
-        return res.status(500).json({ error: 'Erro ao salvar as estatísticas.' });
+        console.error('Erro ao salvar tempoAtiv:', err);
+        return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
       }
 
-      // Se não houver erro, enviar uma resposta de sucesso
-      res.status(200).json({ message: 'Tempo e estatísticas salvos com sucesso!' });
+      // Retorna o tempo total acumulado
+      res.status(200).json({ message: 'Tempo total salvo com sucesso!', totalTime });
     });
   });
 });
 
+//login
+app.post('/login', (req, res) => {
+  const { email, senha } = req.body;
 
+  if (!email || !senha) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+  }
 
+  // Consulta o banco de dados para verificar o usuário
+  db.query('SELECT * FROM tblogin WHERE email = ?', [email], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao consultar o banco de dados' });
+    }
 
+    if (result.length === 0) {
+      return res.status(401).json({ error: 'Usuário não encontrado' });
+    }
+
+    const user = result[0];
+
+    // Verifica a senha com bcrypt
+    bcrypt.compare(senha, user.senha, (err, isMatch) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao verificar a senha' });
+      }
+
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Senha incorreta' });
+      }
+
+      // Se a senha estiver correta, envia uma resposta de sucesso
+      res.status(200).json({ message: 'Login bem-sucedido', token: 'fake-jwt-token' });
+    });
+  });
+});
 
 // Rota para cadastro de usuário
 app.post('/cadastro', (req, res) => {
@@ -73,17 +100,14 @@ app.post('/cadastro', (req, res) => {
     return res.status(400).send('Campos obrigatórios não informados');
   }
 
-  // Verifica se o email já está registrado
   db.query('SELECT * FROM tblogin WHERE email = ?', [email], (err, result) => {
     if (err) return res.status(500).send('Erro no banco de dados');
     if (result.length > 0) return res.status(400).send('Email já registrado');
 
-    // Criptografar a senha
     bcrypt.hash(senha, 10, (err, hashedPassword) => {
       if (err) return res.status(500).send('Erro ao criptografar a senha');
-      
-      // Inserir dados no banco de dados
-      db.query('INSERT INTO tblogin (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashedPassword], (err, result) => {
+
+      db.query('INSERT INTO tblogin (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashedPassword], (err) => {
         if (err) return res.status(500).send('Erro ao registrar usuário');
         res.status(201).send('Cadastro realizado com sucesso');
       });
@@ -91,51 +115,18 @@ app.post('/cadastro', (req, res) => {
   });
 });
 
-// Rota de login
-// Rota de login
-app.post('/login', (req, res) => {
-  console.log('Recebendo dados de login:', req.body);
-  const { email, senha } = req.body;
-
-  if (!email || !senha) {
-    return res.status(400).send('Campos obrigatórios não informados');
-  }
-
-  db.query('SELECT * FROM tblogin WHERE email = ?', [email], (err, result) => {
-    if (err) return res.status(500).send('Erro no banco de dados');
-    if (result.length === 0) return res.status(400).send('Usuário não encontrado');
-
-    const user = result[0];
-
-    // Comparação da senha usando bcrypt
-    bcrypt.compare(senha, user.senha, (err, isMatch) => {
-      if (err) return res.status(500).send('Erro ao comparar senhas');
-      if (!isMatch) return res.status(400).send('Senha incorreta');
-
-      // Gerar token JWT
-      const token = jwt.sign({ idu: user.idu }, 'secreta', { expiresIn: '1h' });
-      res.json({ message: 'Login bem-sucedido', token });
-    });
-  });
-});
-
-
-
-
 // Rota para adicionar um compromisso
-app.post('/api/calendario', authenticateToken, (req, res) => {
+app.post('/api/calendario', (req, res) => {
   const { name, time, location, details, date, anotacoes } = req.body;
 
-  if (!name || !time || !location || !date) {
-    return res.status(400).send('Campos obrigatórios não informados');
+  if (!name || !time || !location || !date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).send('Campos obrigatórios não informados ou formato de data inválido');
   }
-
-  console.log('Recebendo dados para adicionar compromisso:', req.body);
-
+  
+  // Verifica se já existe um compromisso para a mesma data e hora
   const checkQuery = 'SELECT * FROM calendario WHERE DATE(dataAtiv) = ? AND time = ? AND location = ?';
   db.query(checkQuery, [date, time, location], (err, result) => {
     if (err) {
-      console.error('Erro ao verificar compromisso existente:', err);
       return res.status(500).send('Erro ao verificar compromisso');
     }
 
@@ -146,51 +137,47 @@ app.post('/api/calendario', authenticateToken, (req, res) => {
     const query = 'INSERT INTO calendario (name, time, location, details, dataAtiv, anotacoes) VALUES (?, ?, ?, ?, ?, ?)';
     db.query(query, [name, time, location, details, date, anotacoes], (err, result) => {
       if (err) {
-        console.error('Erro ao adicionar compromisso:', err);
         return res.status(500).send('Erro ao adicionar compromisso');
       }
 
-      res.status(201).send({
-        id: result.insertId,
-        name,
-        time,
-        location,
-        details,
-        date,
-        anotacoes
-      });
+      res.status(201).send({ id: result.insertId, name, time, location, details, date, anotacoes });
     });
   });
 });
 
-// Rota para buscar compromissos de uma data específica
-app.get('/api/calendario/:date', authenticateToken, (req, res) => {
-  const { date } = req.params;
 
-  const regex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!regex.test(date)) {
-    return res.status(400).json({ error: 'Formato de data inválido. Use YYYY-MM-DD.' });
-  }
+app.get('/api/calendario/month/:monthKey', (req, res) => {
+  const { monthKey } = req.params;
 
-  console.log(`Buscando compromissos para a data: ${date}`);
-  
-  const query = 'SELECT * FROM calendario WHERE DATE(dataAtiv) = ?';
-  db.query(query, [date], (err, result) => {
+  const query = 'SELECT * FROM calendario WHERE DATE_FORMAT(dataAtiv, "%Y-%m") = ?';
+  db.query(query, [monthKey], (err, result) => {
     if (err) {
-      console.error('Erro ao buscar compromissos:', err);
-      return res.status(500).json({ error: 'Erro ao buscar dados' });
+      return res.status(500).json({ error: 'Erro ao buscar compromissos mensais.' });
     }
-
-    if (result.length === 0) {
-      return res.status(404).json({ error: 'Nenhum compromisso encontrado' });
-    }
-
     res.status(200).json(result);
   });
 });
 
+
+
+
+// Rota para buscar compromissos de uma data específica
+app.get('/api/calendario/:date', (req, res) => {
+  const { date } = req.params;
+
+  // Use DATE_FORMAT para garantir que a comparação de datas seja feita corretamente
+  const query = 'SELECT * FROM calendario WHERE DATE_FORMAT(dataAtiv, "%Y-%m-%d") = ?';
+  db.query(query, [date], (err, result) => {
+    if (err) {
+      console.error('Erro ao buscar compromissos:', err);
+      return res.status(500).send('Erro ao buscar compromissos');
+    }
+    res.json(result);
+  });
+});
+
 // Rota para deletar um compromisso
-app.delete('/api/calendario/:id', authenticateToken, (req, res) => {
+app.delete('/api/calendario/:id', (req, res) => {
   const id = req.params.id;
 
   if (!id) {
@@ -200,7 +187,6 @@ app.delete('/api/calendario/:id', authenticateToken, (req, res) => {
   const query = 'DELETE FROM calendario WHERE id = ?';
   db.query(query, [id], (err, result) => {
     if (err) {
-      console.error('Erro ao deletar compromisso:', err);
       return res.status(500).send('Erro ao deletar compromisso');
     }
 

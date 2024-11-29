@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppointments } from '../../context/AppointmentsContext';
+import axios from 'axios';
 import Navbar from '../../components/Navbar';
 import './CalendarPage.css';
 
 const CalendarPage = () => {
-  const { appointments } = useAppointments(); // Acessa os compromissos do contexto
+  const [appointments, setAppointments] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [selectedDate, setSelectedDate] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Hook para buscar compromissos sempre que selectedDate mudar
+  useEffect(() => {
+    const fetchMonthlyAppointments = async () => {
+      setLoading(true);
+      try {
+        const monthKey = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}`;
+        const response = await axios.get(`/api/calendario/month/${monthKey}`);
+        setAppointments(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar compromissos mensais:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchMonthlyAppointments();
+  }, [currentMonth, currentYear]);
+  
 
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -20,17 +41,17 @@ const CalendarPage = () => {
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
 
-  // Função para calcular o último dia do mês
   const lastDayOfMonth = (month, year) => new Date(year, month + 1, 0).getDay();
 
-  // Função para calcular o primeiro dia do próximo mês
   const getNextMonthStartDay = (month, year) => {
     const lastDay = new Date(year, month + 1, 0).getDay(); // Último dia do mês atual
     return (lastDay + 1) % 7; // Primeiro dia do próximo mês
   };
 
   const handleDayClick = (day) => {
-    if (day) {  // Verificar se o dia não é nulo
+    if (day) {
+      const dateString = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      setSelectedDate(dateString);
       navigate(`/day/${currentMonth + 1}/${day}`);
     }
   };
@@ -39,13 +60,11 @@ const CalendarPage = () => {
     let newMonth = currentMonth + 1;
     let newYear = currentYear;
 
-    // Ajusta para o próximo mês e ano, caso necessário
     if (newMonth > 11) {
       newMonth = 0;
       newYear++;
     }
 
-    // Atualiza o mês e ano
     setCurrentMonth(newMonth);
     setCurrentYear(newYear);
   };
@@ -54,13 +73,11 @@ const CalendarPage = () => {
     let newMonth = currentMonth - 1;
     let newYear = currentYear;
 
-    // Ajusta para o mês e ano anterior, caso necessário
     if (newMonth < 0) {
       newMonth = 11;
       newYear--;
     }
 
-    // Atualiza o mês e ano
     setCurrentMonth(newMonth);
     setCurrentYear(newYear);
   };
@@ -68,14 +85,13 @@ const CalendarPage = () => {
   const totalDays = daysInMonth(currentMonth, currentYear);
   const startDay = firstDayOfMonth(currentMonth, currentYear);
 
-  // Determina o primeiro dia do próximo mês com base no último dia do mês atual
   const nextMonthStartDay = getNextMonthStartDay(currentMonth, currentYear);
 
   const calendarDays = [];
 
   // Adiciona os dias em branco antes do primeiro dia do mês
   for (let i = 0; i < startDay; i++) {
-    calendarDays.push({ day: null, isCurrentMonth: false }); // Dias em branco antes do início do mês
+    calendarDays.push({ day: null, isCurrentMonth: false });
   }
 
   // Adiciona os dias do mês atual
@@ -83,25 +99,26 @@ const CalendarPage = () => {
     calendarDays.push({ day: i, isCurrentMonth: true });
   }
 
-  // Preenche o restante do grid com dias do próximo mês, caso o grid não esteja completo
-  const remainingCells = 42 - calendarDays.length; // 42 células no total para completar o grid
-  for (let i = 1; i <= remainingCells; i++) {
-    calendarDays.push({ day: i, isCurrentMonth: false });
+  // Não preenche mais com dias do próximo mês, apenas completa com células vazias
+  const remainingCells = 42 - calendarDays.length;
+  for (let i = 0; i < remainingCells; i++) {
+    calendarDays.push({ day: null, isCurrentMonth: false });
   }
 
   // Função para verificar se o dia tem compromissos
   const checkAppointments = (day) => {
     const dayKey = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  
     return appointments.some((appointment) => {
-      const appointmentDate = new Date(appointment.dataAtiv); // Ajuste dependendo do formato da data
-      const appointmentDateString = appointmentDate.toISOString().split('T')[0];
-      return appointmentDateString === dayKey;
+      const appointmentDate = new Date(appointment.dataAtiv).toISOString().split('T')[0];
+      return appointmentDate === dayKey;
     });
   };
+  
 
   return (
     <div className="calendar-container">
-      <Navbar/>
+      <Navbar />
       <h1>{months[currentMonth]} {currentYear}</h1>
       <div className="month-slide">
         <button onClick={goToPreviousMonth}>◀</button>
@@ -114,22 +131,22 @@ const CalendarPage = () => {
 
         {calendarDays.map((item, index) => {
           const { day, isCurrentMonth } = item;
-          if (day === null) return <div key={index} className="calendar-day empty" />; // Dia vazio para completar o grid
-
-          const hasAppointments = checkAppointments(day);
-
+          if (day === null) return <div key={index} className="calendar-day empty" />;
+        
+          const hasAppointments = checkAppointments(day);  // Verifica se o dia tem compromissos
+          const isInteractive = isCurrentMonth;  // Se não for do mês atual, será desativado
+        
           return (
             <div
               key={index}
               className={`calendar-day ${hasAppointments ? 'has-appointments' : ''} ${!isCurrentMonth ? 'not-current-month' : ''}`}
-              onClick={() => handleDayClick(day)}
+              onClick={isInteractive ? () => handleDayClick(day) : null}
             >
-              {day}
+              {isCurrentMonth ? day : ''}
             </div>
           );
         })}
       </div>
-      
     </div>
   );
 };

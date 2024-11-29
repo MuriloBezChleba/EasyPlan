@@ -9,20 +9,20 @@ export const useAppointments = () => {
   return useContext(AppointmentsContext);
 };
 
-// Componente que vai fornecer o estado e funções para os compromissos
+// Componente que fornece o estado e funções para compromissos
 export const AppointmentsProvider = ({ children }) => {
   const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(false);  // Estado para controle de carregamento
-  const [error, setError] = useState(null);  // Estado para controle de erro
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Função para buscar compromissos do backend com base na data
-  const fetchAppointments = async (dateKey) => {
+  // fetchAppointments no contexto
+  const fetchAppointments = async (monthKey) => {
     setLoading(true);
-    setError(null);  // Reseta o erro sempre que começa uma nova requisição
-
+    setError(null);
     try {
-      const response = await axios.get(`http://localhost:5000/api/calendario/${dateKey}`);
-      setAppointments(response.data);  // Atualiza os compromissos com a data correta
+      const response = await axios.get(`/api/calendario/${monthKey}`);
+      setAppointments(response.data);  // Carrega os compromissos para o mês
     } catch (error) {
       console.error('Erro ao buscar compromissos:', error);
       setError('Erro ao carregar compromissos. Tente novamente mais tarde.');
@@ -30,18 +30,26 @@ export const AppointmentsProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  
+  
+
+  
+  
+  
 
   // Função para adicionar um compromisso
   const addAppointment = async (newAppointment) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/calendario', newAppointment);
-      // Adiciona ao estado após o retorno do servidor, com o id gerado
-      setAppointments((prev) => [...prev, { ...newAppointment, id: response.data.id }]);
+      const response = await axios.post('/api/calendario', newAppointment);
+      setAppointments((prevAppointments) => [...prevAppointments, { ...response.data, dataAtiv: newAppointment.date }]);
     } catch (error) {
       console.error('Erro ao adicionar compromisso:', error);
-      throw error;  // Lançando erro para o frontend capturar
+      setError('Erro ao adicionar compromisso. Tente novamente.');
+      throw error;
     }
   };
+  
+  
 
   // Função para deletar um compromisso
   const deleteAppointment = async (id) => {
@@ -49,16 +57,27 @@ export const AppointmentsProvider = ({ children }) => {
       console.error('ID não fornecido para deletar compromisso');
       return;
     }
+
     try {
-      await axios.delete(`http://localhost:5000/api/calendario/${id}`);
-      setAppointments((prev) => prev.filter((app) => app.id !== id));  // Atualiza estado após exclusão
+      await axios.delete(`/api/calendario/${id}`);
+      setAppointments((prev) => prev.filter((app) => app.id !== id));
     } catch (error) {
       console.error('Erro ao deletar compromisso:', error);
+      setError('Erro ao deletar compromisso. Tente novamente.');
     }
   };
 
   return (
-    <AppointmentsContext.Provider value={{ appointments, fetchAppointments, addAppointment, deleteAppointment, loading, error }}>
+    <AppointmentsContext.Provider
+      value={{
+        appointments,
+        fetchAppointments,
+        addAppointment,
+        deleteAppointment,
+        loading,
+        error,
+      }}
+    >
       {children}
     </AppointmentsContext.Provider>
   );

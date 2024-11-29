@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
 import './AccountPage.css';
 
 const AccountPage = () => {
@@ -18,6 +19,7 @@ const AccountPage = () => {
 
   return (
     <div className="account-container">
+      <Navbar/>
       <h1>Configurações da Conta</h1>
       <div className="options-container">
         <button onClick={() => handleOptionClick('Mudar Nome de Usuário')}>

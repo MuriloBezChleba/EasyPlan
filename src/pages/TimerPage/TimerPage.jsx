@@ -10,30 +10,31 @@ const TimerPage = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [selectedTime, setSelectedTime] = useState(25); // Tempo default de 25 minutos
   const [timerId, setTimerId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false); // Novo estado para controle de inserção
   const [hasStarted, setHasStarted] = useState(false); // Para controlar se o timer já foi iniciado
   const navigate = useNavigate();
 
   const startTimer = () => {
-    if (selectedTime <= 0) return;
-
+    if (selectedTime <= 0 || isRunning) return; // Verifica se o timer já está rodando
+  
     setIsRunning(true);
     setTime(selectedTime * 60); // Converte minutos para segundos
     setHasStarted(true);
-
+  
     const id = setInterval(() => {
       setTime((prevTime) => {
         if (prevTime <= 1) {
-          clearInterval(id);
+          clearInterval(id); // Cancela o intervalo quando o tempo chega a 0
           setIsRunning(false);
-          setHasStarted(false); // Resetar o estado de início após terminar
-          savePomodoro(selectedTime); // Salva o tempo quando o timer acabar
-          return 0;
+          setHasStarted(false);
+          savePomodoro(selectedTime); // Salva o tempo ao finalizar (em minutos)
+          return 0; // Reseta o tempo para 0
         }
         return prevTime - 1;
       });
     }, 1000);
-
-    setTimerId(id);
+  
+    setTimerId(id); // Armazena o id do timer
   };
 
   const stopTimer = () => {
@@ -43,24 +44,46 @@ const TimerPage = () => {
     setSelectedTime(25); // Resetar o tempo selecionado para o valor default
   };
 
+
   const savePomodoro = (tempoAtiv) => {
-    // Chama a API para salvar o tempo no banco de dados
+    // Se já está salvando, não faz nada
+    if (isSaving) return;
+  
+    setIsSaving(true); // Marca como 'salvando'
+  
+    const tempoAtivNum = Number(tempoAtiv); // Converte para número
+  
+    console.log('Tempo de atividade sendo enviado:', tempoAtivNum); // Adicione esse log para verificar o valor
+  
+    if (isNaN(tempoAtivNum) || tempoAtivNum <= 0) {
+      alert("Tempo inválido");
+      setIsSaving(false); // Marca como 'não salvando'
+      return;
+    }
+  
     fetch('http://localhost:5000/save-pomodoro', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ tempoAtiv: time }), // Envia o valor correto
+      body: JSON.stringify({ tempoAtiv: tempoAtivNum }), // Envia como número
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Resposta do servidor:', data);
-    })
-    .catch(error => {
-      console.error('Erro ao salvar o tempo:', error);
-    });
-    
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Tempo total salvo:', data.totalTime);
+        alert(`Tempo total acumulado: ${data.totalTime} minutos`);
+      })
+      .catch((error) => {
+        console.error('Erro ao salvar o tempo:', error);
+      })
+      .finally(() => {
+        setIsSaving(false); // Marca como 'não salvando' depois de finalizar
+      });
   };
+  
+  
+
+  
 
   useEffect(() => {
     // Resetar o timer se o usuário mudar de página
@@ -74,11 +97,6 @@ const TimerPage = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
-
-  const handleNavigate = () => {
-    stopTimer();
-    navigate('/outra-pagina'); // Mude para o caminho desejado
-  };
 
   return (
     <div className="timer-container">
