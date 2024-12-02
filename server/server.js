@@ -18,43 +18,56 @@ const db = mysql.createConnection({
 
 //salvar o pomodoro
 app.post('/save-pomodoro', (req, res) => {
-  const { tempoAtiv } = req.body;
-  console.log('Tempo de atividade recebido:', tempoAtiv); // Verifique o valor recebido
-  
-  if (!tempoAtiv || isNaN(tempoAtiv)) {
-    return res.status(400).json({ error: 'Tempo inválido!' });
+  const { tempoAtiv, dataAtiv } = req.body;
+  const horaAtiv = new Date().toISOString().slice(0, 19).replace('T', ' '); // Obtém a data e hora atual no formato correto
+
+  if (!tempoAtiv || isNaN(tempoAtiv) || !dataAtiv) {
+    return res.status(400).json({ error: 'Dados inválidos!' });
   }
 
-  // Verificar se já existe um registro para o mesmo tempo de atividade
-  db.query('SELECT * FROM tbpomodoro ORDER BY id DESC LIMIT 1', (err, result) => {
+  // Verifica se já existe um registro com a mesma horaAtiv
+  db.query('SELECT * FROM tbpomodoro WHERE horaAtiv = ?', [horaAtiv], (err, result) => {
     if (err) {
-      console.error('Erro ao recuperar o tempo total:', err);
-      return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
+      console.error('Erro ao verificar duplicação de horaAtiv:', err);
+      return res.status(500).json({ error: 'Erro ao verificar duplicação de horário.' });
     }
 
-    // Se o tempo de atividade já foi salvo, não insira novamente
-    if (result.length > 0 && result[0].tempoAtiv === tempoAtiv) {
-      return res.status(400).json({ error: 'Esse tempo de atividade já foi salvo.' });
+    if (result.length > 0) {
+      // Se já existe, retorna erro
+      return res.status(400).json({ error: 'Já existe uma inserção com o mesmo horário!' });
     }
 
-    // Recupera o último tempo total armazenado
-    const lastTotalTime = result[0] ? result[0].tempoTotal : 0;
-
-    // Calcula o novo tempo total
-    const totalTime = lastTotalTime + tempoAtiv;
-
-    // Insere o novo tempo de atividade com o tempo total atualizado
-    db.query('INSERT INTO tbpomodoro (tempoAtiv, tempoTotal) VALUES (?, ?)', [tempoAtiv, totalTime], (err) => {
+    // Se não existir duplicação, prossegue com a inserção
+    db.query('SELECT * FROM tbpomodoro ORDER BY id DESC LIMIT 1', (err, result) => {
       if (err) {
-        console.error('Erro ao salvar tempoAtiv:', err);
+        console.error('Erro ao recuperar o tempo total:', err);
         return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
       }
 
-      // Retorna o tempo total acumulado
-      res.status(200).json({ message: 'Tempo total salvo com sucesso!', totalTime });
+      const lastTotalTime = result[0] ? result[0].tempoTotal : 0;
+      const totalTime = lastTotalTime + tempoAtiv;
+
+      db.query('INSERT INTO tbpomodoro (tempoAtiv, tempoTotal, horaAtiv) VALUES (?, ?, ?)', [tempoAtiv, totalTime, horaAtiv], (err) => {
+        if (err) {
+          console.error('Erro ao salvar tempoAtiv:', err);
+          return res.status(500).json({ error: 'Erro ao salvar o tempo de atividade.' });
+        }
+
+        // Insere na tabela tbestat
+        db.query('INSERT INTO tbestat (tempoAtiv, dataAtiv, horaAtiv) VALUES (?, ?, ?)', [tempoAtiv, dataAtiv, horaAtiv], (err) => {
+          if (err) {
+            console.error('Erro ao salvar na tbestat:', err);
+            return res.status(500).json({ error: 'Erro ao salvar a estatística.' });
+          }
+
+          res.status(200).json({ message: 'Tempo salvo com sucesso!', totalTime });
+        });
+      });
     });
   });
 });
+
+
 
 //login
 app.post('/login', (req, res) => {
@@ -197,6 +210,133 @@ app.delete('/api/calendario/:id', (req, res) => {
     res.status(200).send('Compromisso deletado com sucesso');
   });
 });
+
+//get do grafico
+// Adicionar biblioteca para lidar com formatação de datas
+const moment = require('moment');
+
+app.get('/api/grafico', (req, res) => {
+  const query = `
+    SELECT DATE(dataAtiv) AS data, SUM(tempoAtiv) AS tempoTotal
+    FROM tbestat
+    WHERE DATE(dataAtiv) BETWEEN CURDATE() - INTERVAL 6 DAY AND CURDATE()
+    GROUP BY DATE(dataAtiv)
+    ORDER BY DATE(dataAtiv) ASC;
+  `;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error('Erro ao consultar dados:', err);
+      return res.status(500).json({ error: 'Erro ao consultar dados' });
+    }
+
+    const days = [];
+    const timeData = [];
+
+    // Gerar os últimos 7 dias no formato 'YYYY-MM-DD'
+    for (let i = 6; i >= 0; i--) {
+      const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
+      days.push(date);
+      timeData.push(0);
+    }
+
+    // Mapeamento dos resultados
+    result.forEach(row => {
+      const index = days.indexOf(moment(row.data).format('YYYY-MM-DD'));
+      if (index !== -1) {
+        timeData[index] = row.tempoTotal;
+      }
+    });
+
+    console.log("Datas geradas:", days);
+    console.log("TimeData mapeado:", timeData);
+    res.json({ days, timeData });
+  });
+});
+
+
+// Rota para listar todas as listas com suas tarefas
+app.get('/listas', (req, res) => {
+  const query = `
+    SELECT listas.id, listas.nome, listas.data_criacao,
+      (SELECT JSON_ARRAYAGG(
+          JSON_OBJECT('id', tarefas.id, 'nome', tarefas.nome, 'concluida', tarefas.concluida)
+        ) 
+      FROM tarefas WHERE tarefas.lista_id = listas.id) AS tarefas
+    FROM listas
+  `;
+
+  db.query(query, (err, lists) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao buscar listas' });
+    }
+    res.status(200).json(lists);
+  });
+});
+
+
+// Rota para criar uma nova tarefa
+app.post('/tarefas', (req, res) => {
+  const { lista_id, nome } = req.body;
+
+  if (!lista_id || !nome) {
+    return res.status(400).json({ error: 'Lista ID e nome da tarefa são obrigatórios' });
+  }
+
+  const query = 'INSERT INTO tarefas (lista_id, nome) VALUES (?, ?)';
+  db.query(query, [lista_id, nome], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao criar tarefa' });
+    }
+    res.status(201).json({ message: 'Tarefa criada com sucesso', tarefaId: result.insertId });
+  });
+});
+
+// Rota para listar as tarefas de uma lista específica
+app.get('/listas/:id/tarefas', (req, res) => {
+  const listaId = req.params.id;
+  const query = 'SELECT * FROM tarefas WHERE lista_id = ?';
+  
+  db.query(query, [listaId], (err, tasks) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao buscar tarefas' });
+    }
+    res.status(200).json(tasks);
+  });
+});
+
+// Rota para atualizar o status da tarefa (concluída ou não)
+app.put('/tarefas/:id', (req, res) => {
+  const tarefaId = req.params.id;
+  const { concluida } = req.body;
+
+  if (typeof concluida !== 'boolean') {
+    return res.status(400).json({ error: 'O status de conclusão deve ser um valor booleano' });
+  }
+
+  const query = 'UPDATE tarefas SET concluida = ? WHERE id = ?';
+  db.query(query, [concluida, tarefaId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao atualizar tarefa' });
+    }
+    res.status(200).json({ message: 'Tarefa atualizada com sucesso' });
+  });
+});
+
+// Rota para excluir uma tarefa
+app.delete('/tarefas/:id', (req, res) => {
+  const tarefaId = req.params.id;
+  const query = 'DELETE FROM tarefas WHERE id = ?';
+  
+  db.query(query, [tarefaId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao excluir tarefa' });
+    }
+    res.status(200).json({ message: 'Tarefa excluída com sucesso' });
+  });
+});
+
+
 
 // Inicia o servidor
 app.listen(port, () => {

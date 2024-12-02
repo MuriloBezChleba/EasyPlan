@@ -23,15 +23,20 @@ const TimerPage = () => {
   
     const id = setInterval(() => {
       setTime((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(id); // Cancela o intervalo quando o tempo chega a 0
-          setIsRunning(false);
-          setHasStarted(false);
-          savePomodoro(selectedTime); // Salva o tempo ao finalizar (em minutos)
-          return 0; // Reseta o tempo para 0
-        }
-        return prevTime - 1;
-      });
+  if (prevTime <= 1) {
+    clearInterval(id); 
+    setIsRunning(false);
+    setHasStarted(false);
+
+    if (!isSaving) {
+      savePomodoro(selectedTime); // Chamada única ao terminar
+    }
+
+    return 0;
+  }
+  return prevTime - 1;
+});
+;
     }, 1000);
   
     setTimerId(id); // Armazena o id do timer
@@ -46,27 +51,18 @@ const TimerPage = () => {
 
 
   const savePomodoro = (tempoAtiv) => {
-    // Se já está salvando, não faz nada
     if (isSaving) return;
   
-    setIsSaving(true); // Marca como 'salvando'
-  
-    const tempoAtivNum = Number(tempoAtiv); // Converte para número
-  
-    console.log('Tempo de atividade sendo enviado:', tempoAtivNum); // Adicione esse log para verificar o valor
-  
-    if (isNaN(tempoAtivNum) || tempoAtivNum <= 0) {
-      alert("Tempo inválido");
-      setIsSaving(false); // Marca como 'não salvando'
-      return;
-    }
+    setIsSaving(true);
+    const tempoAtivNum = Number(tempoAtiv);
+    const dataAtual = new Date().toISOString().split('T')[0]; // Formata a data para o formato YYYY-MM-DD
   
     fetch('http://localhost:5000/save-pomodoro', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ tempoAtiv: tempoAtivNum }), // Envia como número
+      body: JSON.stringify({ tempoAtiv: tempoAtivNum, dataAtiv: dataAtual }), // Envia tempo e data
     })
       .then((response) => response.json())
       .then((data) => {
@@ -77,9 +73,10 @@ const TimerPage = () => {
         console.error('Erro ao salvar o tempo:', error);
       })
       .finally(() => {
-        setIsSaving(false); // Marca como 'não salvando' depois de finalizar
+        setIsSaving(false);
       });
   };
+  
   
   
 

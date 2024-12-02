@@ -108,7 +108,7 @@
 }
 
 .time-selector button:disabled {
-  background-color: #ccc;
+  background-color: #c50000;
   cursor: not-allowed;
 }
 

@@ -6,6 +6,7 @@ import CalendarPage from './pages/CalendarPage/CalendarPage';
 import DayPage from './pages/DayPage/DayPage';
 import AccountPage from './pages/AccountPage/AccountPage';
 import Login from './pages/FirstPage/FirstPage';
+import GraficoPage from './pages/GraficoPage/GraficoPage';
 import { AppointmentsProvider } from './context/AppointmentsContext';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/day/:month/:day" element={<DayPage />} />
         <Route path="/conta" element={<AccountPage />} />
+        <Route path="/grafico" element={<GraficoPage />} />
 
         {/* Rota padrão para páginas não encontradas */}
         <Route path="*" element={<Login />} />

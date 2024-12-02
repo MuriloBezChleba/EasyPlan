@@ -1,0 +1,80 @@
+.checklist-container {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .list {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+  }
+  
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .list-header input {
+    font-size: 1.2rem;
+    border: none;
+    background: transparent;
+    flex: 1;
+  }
+  
+  .tasks {
+    margin-top: 10px;
+  }
+  
+  .task {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+  }
+  
+  .task span {
+    margin-left: 10px;
+    flex: 1;
+  }
+  
+  .task button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 5px;
+  }
+  
+  .add-task {
+    margin-top: 10px;
+  }
+  
+  .add-task input {
+    padding: 5px;
+    margin-right: 10px;
+    flex: 1;
+  }
+  
+  .add-task button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .completed {
+    text-decoration: line-through;
+    color: #888;
+  }
+  

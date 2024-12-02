@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../../components/Navbar';
 import './CalendarPage.css';
+import Checklist from '../../components/Checklist';
 
 const CalendarPage = () => {
   const [appointments, setAppointments] = useState([]);
@@ -147,6 +148,13 @@ const CalendarPage = () => {
           );
         })}
       </div>
+      <Checklist/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
     </div>
   );
 };
