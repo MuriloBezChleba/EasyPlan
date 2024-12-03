@@ -17,41 +17,36 @@
 
 .orbit-container {
   position: absolute;
-  top: 45%; /* Ajusta a posição para subir os planetas */
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  top: 50%;  /* Alinha ao meio vertical */
+  left: 50%;  /* Alinha ao meio horizontal */
+  transform: translate(-50%, -50%);  /* Ajusta para exatamente no centro */
+  width: 100%;  /* Garantir que ocupe todo o espaço disponível */
+  height: 100%;  /* Garantir que ocupe toda a altura */
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translate(-50%, -50%);
 }
 
+
 .large-ball {
-  width: 100px; /* Diâmetro da bola maior */
+  width: 100px;
   height: 100px;
   background-size: cover;
   background-position: center;
   border-radius: 50%;
-  position: relative;
+  position: absolute;  /* Importante para que a bola seja centralizada em relação ao container */
+  top: 50%;  /* Centraliza verticalmente */
+  left: 50%;  /* Centraliza horizontalmente */
+  transform: translate(-50%, -50%);  /* Ajusta a posição para exatamente no centro */
   z-index: 2;
 }
 
-.orbit-start-marker {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background-color: red;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
 
 .orbit-path {
   position: absolute;
   width: 330px; /* Diâmetro da órbita */
   height: 330px;
-  border: 2px solid #007bff; /* Linha sólida */
+  border: 2px solid #007bff;
   border-radius: 50%;
   top: 50%;
   left: 50%;
@@ -59,7 +54,7 @@
 }
 
 .small-ball {
-  width: 20px; /* Diâmetro da bola menor */
+  width: 20px;
   height: 20px;
   background-size: cover;
   background-position: center;
@@ -67,7 +62,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform-origin: -160px 0; /* Origem da rotação */
+  transform-origin: -160px 0; /* A origem da rotação é ajustada aqui */
   animation-name: orbit;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -108,7 +103,7 @@
 }
 
 .time-selector button:disabled {
-  background-color: #c50000;
+  background-color: #ccc;
   cursor: not-allowed;
 }
 

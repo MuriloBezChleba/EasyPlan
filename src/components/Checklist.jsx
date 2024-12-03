@@ -79,6 +79,18 @@ const Checklist = () => {
       });
   };
 
+  // Função para excluir uma lista
+  const deleteList = (listId) => {
+    axios.delete(`http://localhost:5000/listas/${listId}`)
+      .then(() => {
+        fetchLists(); // Atualiza as listas após a exclusão
+      })
+      .catch((error) => {
+        console.error('Erro ao excluir lista:', error);
+      });
+  };
+
+
   // Carregar as listas do banco de dados ao montar o componente
   useEffect(() => {
     fetchLists();
@@ -106,6 +118,7 @@ const Checklist = () => {
               value={list.nome}
               onChange={(e) => changeListName(list.id, e.target.value)}
             />
+            <button onClick={() => deleteList(list.id)}>Excluir Lista</button>
           </div>
 
           <div className="tasks">

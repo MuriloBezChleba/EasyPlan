@@ -255,6 +255,25 @@ app.get('/api/grafico', (req, res) => {
 });
 
 
+
+// Rota para criar uma nova lista
+app.post('/listas', (req, res) => {
+  const { nome } = req.body;
+
+  if (!nome) {
+    return res.status(400).json({ error: 'Nome da lista é obrigatório' });
+  }
+
+  const query = 'INSERT INTO listas (nome) VALUES (?)';
+  db.query(query, [nome], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao criar lista' });
+    }
+    res.status(201).json({ message: 'Lista criada com sucesso', listaId: result.insertId });
+  });
+});
+
+
 // Rota para listar todas as listas com suas tarefas
 app.get('/listas', (req, res) => {
   const query = `
@@ -273,6 +292,30 @@ app.get('/listas', (req, res) => {
     res.status(200).json(lists);
   });
 });
+
+// Rota para alterar o nome de uma lista
+app.put('/listas/:id', (req, res) => {
+  const listaId = req.params.id;
+  const { nome } = req.body;
+
+  if (!nome) {
+    return res.status(400).json({ error: 'Nome da lista é obrigatório' });
+  }
+
+  const query = 'UPDATE listas SET nome = ? WHERE id = ?';
+  db.query(query, [nome, listaId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao atualizar lista' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Lista não encontrada' });
+    }
+
+    res.status(200).json({ message: 'Lista atualizada com sucesso' });
+  });
+});
+
 
 
 // Rota para criar uma nova tarefa
@@ -336,6 +379,53 @@ app.delete('/tarefas/:id', (req, res) => {
   });
 });
 
+
+// Rota para excluir uma lista e suas tarefas associadas
+app.delete('/listas/:id', (req, res) => {
+  const listaId = req.params.id;
+
+  // Exclui as tarefas associadas antes de excluir a lista
+  const deleteTasksQuery = 'DELETE FROM tarefas WHERE lista_id = ?';
+  db.query(deleteTasksQuery, [listaId], (err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao excluir tarefas da lista' });
+    }
+
+    // Exclui a lista
+    const deleteListQuery = 'DELETE FROM listas WHERE id = ?';
+    db.query(deleteListQuery, [listaId], (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao excluir lista' });
+      }
+      res.status(200).json({ message: 'Lista excluída com sucesso' });
+    });
+  });
+});
+
+app.get('/get-last-pomodoro', (req, res) => {
+  const query = 'SELECT idPlaneta FROM tbpomodoro ORDER BY id DESC LIMIT 1';
+  db.query(query, (err, result) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar último pomodoro' });
+    res.status(200).json(result[0] || { idPlaneta: null });
+  });
+});
+
+app.put('/update-planet', (req, res) => {
+  const { idPlaneta } = req.body;
+  const query = 'UPDATE tbpomodoro SET idPlaneta = ? ORDER BY id DESC LIMIT 1';
+  db.query(query, [idPlaneta], (err) => {
+    if (err) return res.status(500).json({ error: 'Erro ao atualizar planeta' });
+    res.status(200).json({ message: 'Planeta atualizado com sucesso' });
+  });
+});
+
+app.get('/get-total-time', (req, res) => {
+  const query = 'SELECT tempoTotal FROM tbpomodoro ORDER BY id DESC LIMIT 1';
+  db.query(query, (err, result) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar tempo total' });
+    res.status(200).json(result[0] || { tempoTotal: 0 });
+  });
+});
 
 
 // Inicia o servidor

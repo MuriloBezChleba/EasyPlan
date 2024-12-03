@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import './GraficoPage.css'
+import './GraficoPage.css';
 import Navbar from '../../components/Navbar';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -16,12 +16,10 @@ const GraficoPage = () => {
       .then(data => {
         console.log(data);  // Verifique se os dados estão sendo recebidos corretamente
 
-        // Divide cada valor de timeData por 2
-        const modifiedTimeData = data.timeData.map(time => time / 2);
-
+        // Não modifica mais os valores de timeData
         setGraficoData({
           days: data.days,
-          timeData: modifiedTimeData
+          timeData: data.timeData,
         });
       })
       .catch(error => {
@@ -66,13 +64,13 @@ const GraficoPage = () => {
         <Navbar />
         <h2>Gráfico de Tempo Utilizado nos Últimos 7 Dias</h2>
         <Line data={data} options={options} />
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
     </div>
   );
 };

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './TimerPage.css';
 import Navbar from '../../components/Navbar';
-import EarthImage from '../../images/terra.svg'; // Imagem da Terra
 import MoonImage from '../../images/lua.svg'; // Imagem da Lua
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Game from '../../components/Game';
 
 const TimerPage = () => {
   const [time, setTime] = useState(0); // Tempo em segundos
@@ -11,6 +12,8 @@ const TimerPage = () => {
   const [selectedTime, setSelectedTime] = useState(25); // Tempo default de 25 minutos
   const [timerId, setTimerId] = useState(null);
   const [isSaving, setIsSaving] = useState(false); // Novo estado para controle de inserção
+  const [showMenu, setShowMenu] = useState(false); // Estado para controlar o menu do jogo
+  const [selectedPlanetId, setSelectedPlanetId] = useState(1);
   const [hasStarted, setHasStarted] = useState(false); // Para controlar se o timer já foi iniciado
   const navigate = useNavigate();
 
@@ -23,20 +26,19 @@ const TimerPage = () => {
   
     const id = setInterval(() => {
       setTime((prevTime) => {
-  if (prevTime <= 1) {
-    clearInterval(id); 
-    setIsRunning(false);
-    setHasStarted(false);
-
-    if (!isSaving) {
-      savePomodoro(selectedTime); // Chamada única ao terminar
-    }
-
-    return 0;
-  }
-  return prevTime - 1;
-});
-;
+        if (prevTime <= 1) {
+          clearInterval(id); 
+          setIsRunning(false);
+          setHasStarted(false);
+  
+          if (!isSaving) {
+            savePomodoro(selectedTime); // Chamada única ao terminar
+          }
+  
+          return 0;
+        }
+        return prevTime - 1;
+      });
     }, 1000);
   
     setTimerId(id); // Armazena o id do timer
@@ -48,7 +50,6 @@ const TimerPage = () => {
     setHasStarted(false);
     setSelectedTime(25); // Resetar o tempo selecionado para o valor default
   };
-
 
   const savePomodoro = (tempoAtiv) => {
     if (isSaving) return;
@@ -76,56 +77,59 @@ const TimerPage = () => {
         setIsSaving(false);
       });
   };
-  
-  
-  
 
-  
+  const handlePlanetSelect = (planetId) => {
+    setSelectedPlanetId(planetId);
+    setShowMenu(false); // Fechar o menu após seleção
+    axios.put('http://localhost:5000/update-planet', { idPlaneta: planetId })
+    .catch((error) => console.error('Erro ao atualizar planeta:', error));
+
+  };
 
   useEffect(() => {
-    // Resetar o timer se o usuário mudar de página
-    const handleBeforeUnload = () => {
-      stopTimer();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+    axios.get('http://localhost:5000/get-last-pomodoro')
+      .then((response) => {
+        setSelectedPlanetId(response.data.idPlaneta || 0); // Aqui verifica se existe um valor de idPlaneta
+      })
+      .catch((error) => console.error('Erro ao buscar planeta:', error));
   }, []);
+  
 
   return (
     <div className="timer-container">
       <Navbar />
       <div className="timer">
-        <div className="orbit-container">
-          {/* Marca de onde a Lua começa */}
-          <div className="orbit-start-marker"></div>
+        {/* Exibe o planeta grande apenas uma vez aqui */}
+        {!showMenu && (
+          <div
+            className="large-ball"
+            onClick={() => setShowMenu(true)} // Abre o menu do jogo ao clicar na bola
+            style={{
+              backgroundImage: `url(/planetas/${selectedPlanetId}.svg)` // Aplique a imagem do planeta com interpolação de string
+            }}
+          />
+        
+        )}
 
+        {/* Exibe o Game component apenas quando showMenu for true */}
+        {showMenu && <Game onSelectPlanet={handlePlanetSelect} />}
+
+        <div className="orbit-container">
           {/* Trajetória (caminho da órbita) */}
           <div className="orbit-path"></div>
 
-          {/* Bola maior com imagem (Terra) */}
+          {/* Esta parte do código será para exibir o planeta pequeno ou o movimento, não o grande */}
           <div
-            className="large-ball"
+            className="small-ball"
             style={{
-              backgroundImage: `url(${EarthImage})`,
+              backgroundImage: `url(${MoonImage})`,
+              animationDuration: `${selectedTime * 60}s`,
+              animationPlayState: isRunning ? 'running' : 'paused',
             }}
-          >
-            {/* Bola menor com imagem (Lua) */}
-            <div
-              className="small-ball"
-              style={{
-                backgroundImage: `url(${MoonImage})`,
-                animationDuration: `${selectedTime * 60}s`, // Define o tempo da animação
-                animationPlayState: isRunning ? 'running' : 'paused', // Controla o estado da animação
-              }}
-            />
-          </div>
+          />
         </div>
       </div>
-
+          
       <div className="time-control">
         {!isRunning ? (
           <div className="time-selector">
@@ -150,6 +154,11 @@ const TimerPage = () => {
         )}
       </div>
     </div>
+
+
+
+
+
   );
 };
 
