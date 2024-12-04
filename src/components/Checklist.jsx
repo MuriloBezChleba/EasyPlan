@@ -100,14 +100,14 @@ const Checklist = () => {
     <div className="checklist-container">
       <h1>Check-lists</h1>
 
-      <div>
+      <div className=' nomeLista'>
         <input
           type="text"
           placeholder="Nome da nova lista"
           value={newListName}
           onChange={(e) => setNewListName(e.target.value)}
         />
-        <button onClick={addList}>Adicionar Lista</button>
+        <button onClick={addList}>+</button>
       </div>
 
       {lists.map((list) => (
@@ -131,7 +131,7 @@ const Checklist = () => {
                     onChange={() => toggleTaskCompletion(task.id, task.concluida)}
                   />
                   <span className={task.concluida ? 'completed' : ''}>{task.nome}</span>
-                  <button onClick={() => deleteTask(task.id)}>Excluir</button>
+                  <button onClick={() => deleteTask(task.id)}>X</button>
                 </div>
               ))
             ) : (
@@ -146,7 +146,7 @@ const Checklist = () => {
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
             />
-            <button onClick={() => addTask(list.id)}>Adicionar Tarefa</button>
+            <button onClick={() => addTask(list.id)}>+</button>
           </div>
         </div>
       ))}

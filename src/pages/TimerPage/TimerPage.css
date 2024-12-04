@@ -1,10 +1,14 @@
+body{
+
+  background: linear-gradient(135deg, #0a1d37 0%, #070380 75%, #191583 85%, #ffffff 100%);
+}
+
 .timer-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f0f0f0;
   font-family: Arial, sans-serif;
 }
 
@@ -27,7 +31,6 @@
   justify-content: center;
 }
 
-
 .large-ball {
   width: 100px;
   height: 100px;
@@ -40,7 +43,6 @@
   transform: translate(-50%, -50%);  /* Ajusta a posição para exatamente no centro */
   z-index: 2;
 }
-
 
 .orbit-path {
   position: absolute;
@@ -83,6 +85,7 @@
 
 .time-selector label {
   display: block;
+  margin-top: 50px;
   margin-bottom: 10px;
 }
 
@@ -90,6 +93,12 @@
   width: 80px;
   padding: 5px;
   margin-right: 10px;
+  width: 50%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .time-selector button,
@@ -103,13 +112,22 @@
 }
 
 .time-selector button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  background-color: #d3d3d3;
 }
 
 .time-display span {
-  font-size: 32px;
+  margin-top: 50px;
+  font-size: 24px;
   font-weight: bold;
-  display: block;
-  margin-bottom: 10px;
+  color: aliceblue;
+}
+
+.time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-display button {
+  margin-top: 10px;
 }

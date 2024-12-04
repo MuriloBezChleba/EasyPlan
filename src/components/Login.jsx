@@ -48,29 +48,30 @@ const Login = ({ setIsAuthenticated }) => {
   return (
     <div className="login-container">
       <Logo />
-      <h1>Login</h1>
       <label htmlFor="email">E-mail:</label>
       <input
         type="email"
         id="email"
+        className="email-input"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Digite seu e-mail"
       />
-
+    
       <label htmlFor="senha">Senha:</label>
       <input
         type="password"
         id="senha"
+        className="password-input"
         value={senha}
         onChange={(e) => setSenha(e.target.value)}
         placeholder="Digite sua senha"
       />
-
+    
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-
-      <button onClick={handleLogin}>Entrar</button>
-      <button onClick={handleRegister}>Registrar</button>
+      
+      <button className="login-button" onClick={handleLogin}>Entrar</button>
+      <button className="register-button" onClick={handleRegister}>Registrar</button>
     </div>
   );
 };

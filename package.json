@@ -12,6 +12,7 @@
     "chart.js": "^4.4.6",
     "cors": "^2.8.5",
     "css-loader": "^7.1.2",
+    "date-fns": "^4.1.0",
     "dom": "^0.0.3",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

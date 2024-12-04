@@ -1,125 +1,36 @@
-/* Células do mês atual */
-*{
-  margin-left: 0px;
+/* Estilos globais */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.calendar-day {
-  cursor: pointer;
-  padding: 15px;
-  text-align: center;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
-.calendar-day.has-appointments {
-  background-color: #ffcc00;
-  color: white;
-  font-weight: bold;
-}
-
-
-/* Células dos dias do próximo mês (não interativas) */
-.calendar-day.not-current-month {
-  background-color: #d3d3d3;  /* Fundo cinza */
-  cursor: not-allowed;  /* Desativa a interatividade */
-  color: #ccc; /* Cor mais suave para os números */
-}
-
-
-.calendar-day.has-appointments {
-  background-color: #ffcc00; /* Cor de fundo para destacar o dia */
-  color: white; /* Cor do texto para o dia */
-  font-weight: bold; /* Deixar o texto em negrito */
-}
-
-
-
-/* Células dos dias com compromissos */
-.calendar-day.has-appointments {
-  background-color: #ff6347;  /* Cor de fundo para dias com compromissos */
-  color: white;
-  font-weight: bold;
-  position: relative;
-}
-
-/* Indicador de compromisso */
-.calendar-day.has-appointments::after {
-  content: '•'; /* Indicador de compromisso */
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  font-size: 16px;
-  color: #d32f2f; /* Cor do ponto de compromisso */
-}
-
-/* Hover para os dias com compromissos */
-.calendar-day.has-appointments:hover {
-  background-color: #f44336; /* Efeito de hover mais intenso */
-}
-
-/* Hover para dias normais */
-.calendar-day:hover {
-  background-color: #e0e0e0; /* Cor de fundo suave no hover */
-  color: #4CAF50; /* Cor do texto no hover */
-}
-
-/* Estilo para dias inativos (fora do mês) */
-.calendar-day.inactive {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-  color: #ccc;
-}
-
-/* Estilo para os dias clicáveis */
-.calendar-day.active {
-  background-color: #fff;
-  color: #333;
-}
-
-/* Estilo para os dias vazios */
-.calendar-day.empty {
-  background-color: transparent;
-  border: none; /* Remove a borda das células vazias */
-}
-
-/* Cabeçalhos dos dias da semana */
-.day-header {
-  font-weight: bold;
-  text-align: center;
-  color: #fff;
-  background-color: #333;
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
-/* Grade do calendário */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 colunas */
-  gap: 1px; /* Pequeno espaço entre as células */
-  margin-top: 20px;
-  border: 1px solid #ccc;
-}
-
-/* Cor de fundo do calendário */
-.calendar-container {
-  padding: 20px;
+body {
   font-family: Arial, sans-serif;
-  text-align: center;
   background-color: #f9f9f9;
+  color: #333;
 }
 
-/* Botões de navegação entre os meses */
+/* Container principal do calendário */
+.calendar-container {
+  padding: 0px;
+  text-align: center;
+  width: 100%;
+}
+
+/* Cabeçalho com o nome do mês e os botões de navegação */
+h1 {
+  font-size: 22px;
+  margin: 10px 0;
+  font-weight: bold;
+  color: white;
+}
+
+/* Navegação entre meses */
 .month-slide button {
-  margin: 10px;
+  margin: 5px;
   padding: 10px;
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   border: none;
   background-color: #4CAF50;
@@ -129,4 +40,119 @@
 
 .month-slide button:hover {
   background-color: #45a049;
+}
+
+/* Grade do calendário */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 colunas */
+  gap: 1px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  grid-template-rows: repeat(6, auto);
+  padding: 8px;
+}
+
+/* Células dos dias da semana */
+.day-header {
+  font-weight: bold;
+  text-align: center;
+  color: #fff;
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* Células do mês atual */
+.calendar-day {
+  cursor: pointer;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 5px;
+  color: #333;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.calendar-day:hover {
+  background-color: #e0e0e0;
+  color: #4CAF50;
+}
+
+/* Células dos dias do próximo mês */
+.calendar-day.not-current-month {
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+/* Células de compromissos */
+.calendar-day.has-appointments {
+  background-color: #ff6347;
+  color: white;
+  font-weight: bold;
+  position: relative;
+}
+
+.calendar-day.has-appointments::after {
+  content: '•';
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 16px;
+  color: #d32f2f;
+}
+
+.calendar-day.has-appointments:hover {
+  background-color: #f44336;
+}
+
+/* Células vazias */
+.calendar-day.empty {
+  background-color: transparent;
+  border: none;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 360px) {
+  .calendar-day {
+    font-size: 12px;
+    padding: 5px;
+    min-width: 30px;
+    min-height: 30px;
+  }
+
+  .day-header {
+    font-size: 10px;
+  }
+
+  .month-slide button {
+    padding: 5px;
+    font-size: 12px;
+  }
+
+  h1 {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 360px) {
+  .calendar-day {
+    font-size: 14px;
+  }
+
+  .month-slide button {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
 }

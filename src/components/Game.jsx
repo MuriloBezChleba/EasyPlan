@@ -3,7 +3,7 @@ import './Game.css'; // Estilização do menu deslizante
 import axios from 'axios';
 
 const planets = [
-  { id: 0, image: '/planetas/0.svg', requiredHours: 0 }, 
+  { id: 0, image: '/planetas/0.svg', requiredHours: 0 },
   { id: 1, image: '/planetas/1.svg', requiredHours: 2 },
   { id: 2, image: '/planetas/2.svg', requiredHours: 5 },
   { id: 3, image: '/planetas/3.svg', requiredHours: 10 },
@@ -17,7 +17,8 @@ const planets = [
 
 const Game = ({ onSelectPlanet }) => {
   const [totalHours, setTotalHours] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(true); // Controlar se o menu está aberto
+  const [menuOpen, setMenuOpen] = useState(false); // Controla a abertura do menu
+  const [selectedPlanetId, setSelectedPlanetId] = useState(null); // Definir o estado do planeta selecionado
   const menuRef = useRef(null); // Referência para o menu
 
   useEffect(() => {
@@ -46,25 +47,36 @@ const Game = ({ onSelectPlanet }) => {
   }, []);
 
   return (
-    <div className={`slide-menu ${menuOpen ? 'open' : 'closed'}`} ref={menuRef}>
-      <h2>Selecione um Planeta</h2>
-      <div className="planet-list">
-        {planets.map((planet) => (
-          <button
-            key={planet.id}
-            className={`planet-button ${totalHours >= planet.requiredHours ? '' : 'locked'}`}
-            onClick={() => totalHours >= planet.requiredHours && onSelectPlanet(planet.id)}
-            disabled={totalHours < planet.requiredHours}
-            style={{
-              backgroundImage: planet.id === null ? 'none' : `url(${planet.image})`, // Evitar erro para o primeiro planeta
-              opacity: totalHours >= planet.requiredHours ? 1 : 0.5, // Diminuir a opacidade dos planetas bloqueados
-            }}
-          >
-            {totalHours < planet.requiredHours && (
-              <span className="locked-message">{planet.requiredHours}h</span> // Mensagem de bloqueio
-            )}
-          </button>
-        ))}
+    <div>
+      {/* Este botão está sendo chamado com uma imagem */}
+      <div
+        className="large-ball"
+        onClick={() => setMenuOpen(true)} // Abre o menu ao clicar na bola
+      />
+      
+      {/* Menu deslizante com planetas */}
+      <div className={`slide-menu ${menuOpen ? 'open' : 'closed'}`} ref={menuRef}>
+        <h2>Selecione um Planeta</h2>
+        <div className="planet-list">
+          {planets.map((planet) => (
+            <button
+              key={planet.id}
+              className={`planet-button ${totalHours >= planet.requiredHours ? '' : 'locked'}`}
+              onClick={() => {
+                if (totalHours >= planet.requiredHours) {
+                  setSelectedPlanetId(planet.id); // Atualiza o planeta selecionado
+                  onSelectPlanet(planet.id); // Executa a função do pai
+                }
+              }}
+              disabled={totalHours < planet.requiredHours}
+              style={{ backgroundImage: `url(${planet.image})` }}
+            >
+              {totalHours < planet.requiredHours && (
+                <span className="locked-message">{planet.requiredHours}h</span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

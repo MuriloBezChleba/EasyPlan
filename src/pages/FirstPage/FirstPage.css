@@ -1,10 +1,26 @@
-main{
-    display: flex;               /* Ativa o flexbox */
+body{
+    margin-top: 0px;
+    background: linear-gradient(135deg, #0a1d37 0%, #070380 75%, #191583 85%, #ffffff 100%);
+}
+
+main {
+    display: flex;                /* Ativa o flexbox */
     justify-content: center; 
-    justify-items: center; 
-}
-
-
-.logo{
+    align-items: center;         /* Centraliza verticalmente */
+    height: 100vh;                /* Ocupa toda a altura da tela */
+    background: linear-gradient(135deg, 
+                              #0a1d37 0%,    /* Azul escuro no topo */
+                              #070380 75%,   /* Azul claro no meio (50% do caminho) */
+                              #ffffff 200%); /* Branco no final */
+  }
+  
+  .conteudo-principal {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .logo {
     justify-content: center;
-}
+  }
+  

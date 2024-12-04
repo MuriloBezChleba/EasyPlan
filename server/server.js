@@ -217,11 +217,11 @@ const moment = require('moment');
 
 app.get('/api/grafico', (req, res) => {
   const query = `
-    SELECT DATE(dataAtiv) AS data, SUM(tempoAtiv) AS tempoTotal
-    FROM tbestat
-    WHERE DATE(dataAtiv) BETWEEN CURDATE() - INTERVAL 6 DAY AND CURDATE()
-    GROUP BY DATE(dataAtiv)
-    ORDER BY DATE(dataAtiv) ASC;
+    SELECT DATE(horaAtiv) AS data, SUM(tempoAtiv) AS tempoTotal
+    FROM tbpomodoro
+    WHERE DATE(horaAtiv) BETWEEN CURDATE() - INTERVAL 6 DAY AND CURDATE()
+    GROUP BY DATE(horaAtiv)
+    ORDER BY DATE(horaAtiv) ASC;
   `;
 
   db.query(query, (err, result) => {
@@ -253,6 +253,7 @@ app.get('/api/grafico', (req, res) => {
     res.json({ days, timeData });
   });
 });
+
 
 
 
@@ -426,6 +427,99 @@ app.get('/get-total-time', (req, res) => {
     res.status(200).json(result[0] || { tempoTotal: 0 });
   });
 });
+
+
+// Atualizar senha com criptografia
+app.put('/update-password', (req, res) => {
+  const { idu, senha } = req.body;
+
+  if (!idu || !senha) {
+    return res.status(400).json({ error: 'Campos obrigatórios não informados' });
+  }
+
+  bcrypt.hash(senha, 10, (err, hashedPassword) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao criptografar a senha' });
+    }
+
+    const query = 'UPDATE tblogin SET senha = ? WHERE idu = ?';
+    db.query(query, [hashedPassword, idu], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao atualizar senha' });
+      }
+      res.status(200).json({ message: 'Senha atualizada com sucesso' });
+    });
+  });
+});
+
+// Atualizar nome de usuário
+app.put('/update-username', (req, res) => {
+  const { idu, nome } = req.body;
+  const query = 'UPDATE tblogin SET nome = ? WHERE idu = ?';
+
+  db.query(query, [nome, idu], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao atualizar nome de usuário' });
+    }
+    res.status(200).json({ message: 'Nome de usuário atualizado com sucesso' });
+  });
+});
+
+// Atualizar email
+app.put('/update-email', (req, res) => {
+  const { idu, email } = req.body;
+  const query = 'UPDATE tblogin SET email = ? WHERE idu = ?';
+
+  db.query(query, [email, idu], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao atualizar email' });
+    }
+    res.status(200).json({ message: 'Email atualizado com sucesso' });
+  });
+});
+
+// Inserir feedback
+app.post('/feedback', (req, res) => {
+  const { idu, nota, comentario } = req.body;
+
+  if (nota < 0 || nota > 5) {
+    return res.status(400).json({ error: 'A nota deve estar entre 0 e 5.' });
+  }
+
+  const query = 'INSERT INTO feedback (idu, nota, comentario) VALUES (?, ?, ?)';
+
+  db.query(query, [idu, nota, comentario], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao inserir feedback' });
+    }
+    res.status(201).json({ message: 'Feedback inserido com sucesso' });
+  });
+});
+
+app.get('/api/tempo', (req, res) => {
+  const queryTotal = 'SELECT tempoTotal FROM tbpomodoro ORDER BY horaAtiv DESC LIMIT 1';  // Pega o tempo da última inserção
+  const queryHoje = 'SELECT SUM(tempoAtiv) AS tempoHoje FROM tbpomodoro WHERE DATE(horaAtiv) = CURDATE()';
+  const queryOntem = 'SELECT SUM(tempoAtiv) AS tempoOntem FROM tbpomodoro WHERE DATE(horaAtiv) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)';
+
+  db.query(queryTotal, (err, totalResult) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar tempo total' });
+
+    db.query(queryHoje, (err, hojeResult) => {
+      if (err) return res.status(500).json({ error: 'Erro ao buscar tempo de hoje' });
+
+      db.query(queryOntem, (err, ontemResult) => {
+        if (err) return res.status(500).json({ error: 'Erro ao buscar tempo de ontem' });
+
+        res.status(200).json({
+          totalTempo: totalResult[0] ? totalResult[0].tempoTotal : 0,  // Se houver resultado, usa o tempo da última inserção
+          tempoHoje: hojeResult[0].tempoHoje || 0,
+          tempoOntem: ontemResult[0].tempoOntem || 0,
+        });
+      });
+    });
+  });
+});
+
 
 
 // Inicia o servidor

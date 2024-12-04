@@ -1,1 +1,82 @@
-/* GraficoPage.css */
+/* Estilos gerais para o gráfico e informações */
+.grafico-container {
+  width: 70%; /* Padrão para telas maiores */
+  height: 600px; /* Aumentando a altura do gráfico */
+  margin: 0 auto;
+}
+
+.tempo-containers {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px; /* Reduzindo o espaço entre o gráfico e as caixas de tempo */
+  color: black;
+  gap: 20px; /* Espaço entre as caixas de tempo */
+  justify-content: space-evenly;
+}
+
+.tempo-box {
+  background-color: #fff;
+  color: black; /* Texto preto por padrão */
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0);
+  width: 180px; /* Largura maior para as caixas */
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0px;
+  transition: transform 0.3s ease;
+}
+
+.grafico-page h2 {
+  color: white; /* Mudando a cor do título h2 para branco */
+  text-align: center; /* Centralizando o título */
+  margin-top: 20px;
+}
+
+/* Mudanças para telas pequenas, como 360x800 */
+@media (max-width: 480px) {
+  .grafico-container {
+    width: 100%; /* Ocupa 100% da largura da tela */
+    height: 360px; /* Faz o gráfico quadrado com altura e largura iguais */
+    margin-bottom: 10px; /* Diminui a distância entre o gráfico e as caixas de tempo */
+  }
+
+  .tempo-containers {
+    flex-direction: row; /* Coloca as caixas de tempo lado a lado */
+    align-items: center; /* Centraliza as caixas verticalmente */
+    justify-content: space-between; /* Espaçamento igual entre as caixas */
+    height: auto;
+    gap: 15px; /* Espaço entre as caixas na versão mobile */
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: -10px; /* Diminui a margem superior para reduzir o espaço entre o gráfico e as caixas */
+  }
+
+  .tempo-box {
+    width: 30%; /* Ajusta para que as caixas ocupem 30% da largura */
+    height: 150px; /* Ajusta a altura das caixas para se adaptar ao espaço */
+    margin-bottom: 0; /* Remove a margem inferior, já que as caixas estão lado a lado */
+  }
+}
+
+
+
+
+/* Mudanças para telas médias (ex: tablets) */
+@media (max-width: 768px) {
+  .grafico-container {
+    width: 90%; /* Ajusta a largura para 90% em telas médias */
+    height: 450px; /* Ajusta a altura do gráfico */
+  }
+
+  .tempo-box {
+    width: 150px; /* Largura intermediária das caixas */
+  }
+}
+
+p{
+  color: black;
+}

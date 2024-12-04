@@ -2,11 +2,11 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: #007bff;
     padding: 10px 0;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: space-around;
+    background-color: #020126;
     align-items: center;
     z-index: 1000;
   }
