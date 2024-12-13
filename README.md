@@ -4,13 +4,13 @@
 
 ## Descrição
 
-O **Easy Plan** é uma plataforma inovadora desenvolvida para auxiliar estudantes e profissionais a gerenciarem melhor seus prazos e tarefas. Este projeto tem como foco principal resolver problemas relacionados a:
+O **Easy Plan** é uma plataforma inovadora desenvolvida como parte do meu Trabalho de Conclusão de Curso (TCC) em **Desenvolvimento de Sistemas**. O objetivo principal do projeto é ajudar estudantes e profissionais a gerenciarem melhor seus prazos e tarefas, focando em resolver problemas relacionados a:
 
 - **Prazos não cumpridos**
 - **Falta de motivação**
 - **Uso excessivo do celular**
 
-A solução propõe uma abordagem simples e intuitiva para organizar atividades, definir metas e monitorar o progresso.
+A solução oferece uma abordagem simples e intuitiva para organizar atividades, definir metas e monitorar o progresso.
 
 ## Funcionalidades
 
@@ -28,5 +28,14 @@ A solução propõe uma abordagem simples e intuitiva para organizar atividades,
 - **Outras Ferramentas**: 
   - Figma (design da interface)
 
+## Como Rodar o Projeto
 
--Iniciar o servidor Backend -> npm run start-server.  Iniciar o servidor Frontend -> npm start
+1. **Iniciar o servidor Backend**:
+
+   ```bash
+   npm run start-server
+2. **Iniciar o servidor Frontend**:
+
+   ```bash
+   npm start
+
