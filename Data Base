@@ -1,0 +1,56 @@
+DROP DATABASE IF EXISTS easy_plan;
+CREATE DATABASE IF NOT EXISTS easy_plan;
+USE easy_plan;
+
+CREATE TABLE tblogin (
+    idu INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL,
+    senha VARCHAR(200) NOT NULL
+);
+CREATE TABLE feedback (
+    idu INT,
+    dataPost TIMESTAMP DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
+    nota INT,
+    comentario text,
+    FOREIGN KEY (idu) REFERENCES tblogin(idu)
+);
+CREATE TABLE tbcadastro (
+    idu INT,
+    dataPost TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    nome VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL,
+    senha VARCHAR(200) NOT NULL,
+    FOREIGN KEY (idu) REFERENCES tblogin(idu),
+    FOREIGN KEY (dataPost) REFERENCES feedback(dataPost)
+);
+CREATE TABLE tbpomodoro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tempoAtiv INT NOT NULL,
+    tempoTotal INT NOT NULL,
+    horaAtiv DATETIME NOT NULL,
+    idPlaneta INT DEFAULT 0
+);
+CREATE TABLE calendario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    time TIME NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    details TEXT,
+    dataAtiv DATE NOT NULL,  -- Data do compromisso
+    anotacoes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE listas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE tarefas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    lista_id INT,
+    nome VARCHAR(255) NOT NULL,
+    concluida BOOLEAN DEFAULT FALSE,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (lista_id) REFERENCES listas(id) ON DELETE CASCADE
+);
